@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 
+3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ccy.common.user.User" table="t_user">
+		<id name="id" column="id" type="int">
+			<generator class="uuid"></generator>
+		</id>
+		<property name="name" type="string">
+			<column name="name" length="20" />
+		</property>
+		<property name="mail" type="string">
+			<column name="mail" length="200" />
+		</property>
+		<property name="phone" type="string">
+			<column name="phone" length="11" />
+		</property>
+		<property name="password" type="string">
+			<column name="password" length="200" />
+		</property>
+		<property name="rePassword" type="string">
+			<column name="rePassword" length="200" />
+		</property>
+		<property name="address" type="string">
+			<column name="address" length="200" />
+		</property>
+		<set name="blogs" cascade="save-update">
+			<key column="user_id" />
+			<one-to-many class="com.ccy.blog.blog.Blog" />
+		</set>
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<package name="base" namespace="/" extends="struts-default">
+		 <interceptors>
+			<interceptor name="ssoLoginIntercePtor" class="com.ccy.common.SsoLoginIntercePtor"></interceptor>
+			<interceptor-stack name="basicStack">
+				<interceptor-ref name="ssoLoginIntercePtor" />
+				<interceptor-ref name="defaultStack" />
+			</interceptor-stack>
+		</interceptors> 
+		<default-action-ref name="index" />
+		<global-results>
+			<result name="error" type="dispatcher">/error.html</result>
+		</global-results>
+		<!-- <global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="error" /> 
+		</global-exception-mappings>-->
+		<action name="loginPage" class="loginAction"  method="loginPage">
+			<result name="input">/login.jsp</result>
+		</action>
+		<action name="login" class="loginAction" method="login">
+			<result name="input">/login.jsp</result>
+		<!-- 	<result name="success">/blog/index.jsp</result> -->
+			 <result type="redirectAction" name="success">
+				<param name="actionName">index</param>
+				<param name="namespace">/blog</param>
+			</result>
+		</action>
+		<action name="index" class="indexAction">
+			<result name="success">/index.jsp</result>
+			<result name="phone">/phone.html</result>
+		</action>
+		 <action name="upload" class="uploadAction" method="upload">
+			<result name="success">/uploadResult.jsp</result>
+		</action>
+		<action name="download" class="downloadAction">
+			<result type="stream">
+				<param name="contentDisposition">attachment;filename=${filename}</param>
+				<param name="inputName">downloadFile</param>
+			</result>
+		</action> 
+		<action name="userAction" class="userAction">
+			<result name="success">/success.jsp</result>
+			<result name="input">/input.jsp</result>
+		</action>
+		<action name="register" class="registerAction">
+			<result name="success">/success.jsp</result>
+			<result name="input">/register.jsp</result>
+		</action>
+	</package>
+	<package name="login" namespace="/login" extends="base">
+		<action name="loginPage" class="loginAction"  method="loginPage">
+			<result name="input">/login.jsp</result>
+		</action>
+		<action name="login" class="loginAction" method="login">
+			<result name="input">/login.jsp</result>
+			<result type="redirectAction" name="success">
+				<param name="actionName">blogList</param>
+				<param name="namespace">/blog</param>
+			</result>
+		</action>
+	</package>
+	<package name="blogAdmin" namespace="/blogAdmin" extends="base">
+		<default-interceptor-ref name="basicStack" />
+		<global-results>
+          <result name="login">/login.jsp</result>
+     	</global-results>
+     	<!-- 为这个包设置默认的拦截器栈 -->
+     	<action name="addBlogPage" class="blogAction" method="addBlogPage">
+			<result name="success">/blog/blogAdd.jsp</result>
+		</action>
+		<action name="addBlog" class="blogAction" method="addBlog">
+		<!-- <result name="success" type="redirectAction">/blog/blogDel?blog.id=${id}</result> -->
+			 <result type="redirectAction" name="success">
+				<param name="actionName">blogDel</param>
+				<param name="namespace">/blog</param>
+				<param name="blog.id">${blog.id}</param>
+			</result> 
+		</action>
+		<action name="addCategoryPage" class="categoryAction" method="addPage">
+			<result name="success">/blog/catagoryAdd.jsp</result>
+		</action>
+		<action name="addCategory" class="categoryAction" method="add">
+			<result name="input">/blog/catagoryAdd.jsp</result>
+			<result name="success" type="redirectAction">
+				<param name="actionName">categoryList</param>
+				<param name="namespace">/blogAdmin</param>
+			</result>
+		</action>
+		<action name="categoryList" class="categoryAction" method="list">
+			<result name="success">/blog/catagoryList.jsp</result>
+		</action>
+		<action name="categoryUpdatePage" class="categoryAction" method="updatePage">
+			<result name="success">/blog/catagoryUpdate.jsp</result>
+		</action>
+		<action name="categoryUpdate" class="categoryAction" method="update">
+				<result name="success" type="redirectAction">
+				<param name="actionName">categoryList</param>
+				<param name="namespace">/blogAdmin</param>
+			</result>
+		</action>
+		<action name="categoryDel" class="categoryAction" method="del">
+			<result name="success" type="redirectAction">
+				<param name="actionName">categoryList</param>
+				<param name="namespace">/blogAdmin</param>
+			</result>
+		</action>
+	</package>
+	<package name="blogManage" namespace="/blogManage" extends="base">
+		<default-interceptor-ref name="basicStack" />
+		<global-results>
+          <result name="login">/login.jsp</result>
+     	</global-results>
+	</package> 
+	
+	<package name="blog" namespace="/blog" extends="base">
+		<default-action-ref name="index" />
+		<action name="top" class="blogAction" method="top">
+			<result name="success">/blog/index_top.jsp</result>
+		</action>
+		<action name="left" class="blogAction" method="left">
+			<result name="success">/blog/index_left.jsp</result>
+		</action>
+		<action name="menu" class="blogAction" method="menu">
+		</action>
+		<action name="main" class="blogAction" method="main">
+			<result name="success">/blog/index_main.jsp</result>
+		</action>
+		<action name="blogDel" class="blogAction" method="blogDel">
+			<result name="success">/blog/blogDel.jsp</result>
+		</action>
+		<action name="blogDetail" class="blogAction" method="blogDetail">
+			<result name="success">/blog/test.jsp</result>
+		</action>
+		<action name="blogList" class="blogAction" method="blogList">
+			<result name="success">/blog/index_main.jsp</result>
+		</action>
+		<action name="list" class="blogAction" method="list">
+			<result name="success">/blog/list.jsp</result>
+		</action>
+		<action name="index" class="blogAction" method="index">
+			<result name="success">/blog/index.jsp</result>
+		</action>
+		<action name="addReplay" class="replayAction" method="addReplay">
+		</action>
+		<action name="categoryList" class="categoryAction" method="categoryList">
+		</action>
+	</package>
+	<package name="weixin" namespace="/weixin" extends="base">
+		<action name="weixinAccess" class="weixinAccessAction" method="weixinAccess">
+		</action>
+	</package>
+</struts>  

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+			http://www.springframework.org/schema/context 
+	        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+			http://www.springframework.org/schema/aop 
+			http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+			http://www.springframework.org/schema/task   
+    		http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/blog?useUnicode=true&amp;characterEncoding=utf8" />
+		<property name="user" value="root" />
+		<property name="password" value="root" />
+		
+		<!--<property name="jdbcUrl"
+			value="jdbc:mysql://w.rdc.sae.sina.com.cn:3307/app_caicongyang"></property> 
+		<property name="driverClass" value="com.mysql.jdbc.Driver"> </property> 
+		<property name="user" value="zny1okkwl2"> </property> 
+		<property name="password" value="hkx5h3klhjwl1k05jmk1y0xhwl2li245yh0k5wkk"> </property>-->
+		
+		<property name="maxPoolSize" value="15" />
+		<property name="minPoolSize" value="1" />
+		<property name="initialPoolSize" value="3" />
+		<property name="idleConnectionTestPeriod" value="60" />
+		<property name="maxIdleTime" value="60" />
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mappingResources">
+			<list>
+				<value>com/ccy/common/user/User.hbm.xml</value>
+				<value>com/ccy/blog/blog/Blog.hbm.xml</value>
+				<value>com/ccy/blog/category/Category.hbm.xml</value>
+				<value>com/ccy/blog/replay/Replay.hbm.xml</value>
+				<value>com/ccy/common/log/Log.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+
+
+	<bean id="trManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+
+	<aop:config>
+		<aop:pointcut expression="execution(* com.ccy.blog.service.impl.*.*(..))"
+			id="allMethod" />
+		<aop:advisor advice-ref="advice" pointcut-ref="allMethod" />
+	</aop:config>
+
+	<bean id="myLogger" class="com.ccy.common.MyLogger">
+		<property name="logService" ref="logService"></property>
+	</bean>
+	
+
+	<tx:advice id="advice" transaction-manager="trManager">
+		<tx:attributes>
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="*" propagation="REQUIRED" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+	
+	<!--记录登录日志  -->	
+	<aop:config>
+		<aop:pointcut id="loginPointcut" expression="execution(* com.ccy.common.login.dao.impl.LoginDaoImpl.*(..))" />
+		<aop:aspect id="loginbean" ref="myLogger">
+			<aop:after-returning method="adminLogger" returning="retVal" pointcut-ref="loginPointcut"/>
+		</aop:aspect>
+	</aop:config> 
+	
+	<!--记录操作博客日志  -->	
+	 <aop:config>
+		<aop:pointcut id="actionPointcut" expression="execution(* com.ccy.blog.blog.service.impl.BlogServiceImpl.*(..))" />
+		<aop:aspect id="actionbean" ref="myLogger">
+			<aop:around method="opeatorLogger" pointcut-ref="actionPointcut"/>
+		</aop:aspect>
+	</aop:config>  
+
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+
+	<!-- 定时器 "0 25 8 ? * MON-FRI" -->
+	<task:annotation-driven />
+	<bean id="mailSchedul" class="com.ccy.util.mail.SimpleMailSender"></bean>
+	<task:scheduled-tasks>
+		<task:scheduled ref="mailSchedul" method="send"
+			cron="0 25 8 ? * MON-FRI" />
+	</task:scheduled-tasks>
+
+	<!--  ====== action Bean======    -->
+	<bean id="indexAction" class="com.ccy.common.index.action.IndexAction" scope="prototype">
+	</bean>
+	<bean id="loginAction" class="com.ccy.common.login.action.LoginAction" scope="prototype">
+		<property name="loginService" ref="loginService"></property>
+	</bean>
+	<bean id="blogAction" class="com.ccy.blog.blog.action.BlogAction" scope="prototype" >
+		<property name="blogService" ref="blogService"></property>
+		<property name="categoryService" ref="categoryService"></property>
+	</bean>
+	<bean id="replayAction" class="com.ccy.blog.replay.action.ReplayAction" scope="prototype">
+		<property name="replayService" ref="replayService"></property>
+	</bean>
+	<bean id="categoryAction" class="com.ccy.blog.category.action.CategoryAction" scope="prototype">
+		<property name="categoryService" ref="categoryService"></property>
+	</bean>
+	<bean id="weixinAccessAction" class="com.ccy.weixin.action.WeixinAccessAction" scope="prototype">
+	</bean>
+	<bean id="uploadAction" class="com.ccy.test.action.uploadAction" scope="prototype">
+	</bean>
+	<bean id="downloadAction" class="com.ccy.test.action.downloadAction" scope="prototype">
+	</bean>
+	<bean id="userAction" class="com.ccy.test.action.UserAction" scope="prototype">
+	</bean>
+
+	<bean id="registerAction" class="com.ccy.test.action.RegisterAction" scope="prototype">
+	</bean>
+
+	<!--  ====== service Bean======    -->
+	<bean id="loginService" class="com.ccy.common.login.service.impl.LoginServerImpl">
+		<property name="loginDao" ref="loginDao"></property>
+	</bean>
+	<bean id="blogService" class="com.ccy.blog.blog.service.impl.BlogServiceImpl">
+		<property name="blogDao" ref="blogDao"></property>
+	</bean>
+	<bean id="replayService" class="com.ccy.blog.replay.service.impl.ReplayServiceImpl">
+		<property name="replayDao" ref="replayDao"></property>
+	</bean>
+	<bean id="categoryService" class="com.ccy.blog.category.service.impl.CategoryServiceImpl">
+		<property name="categoryDao" ref="categoryDao"></property>
+	</bean>
+	<bean id="logService" class="com.ccy.common.log.service.impl.LogServiceImpl">
+		<property name="logDao" ref="logDao"></property>
+	</bean>
+	<!--  ====== dao Bean======    -->
+	<bean id="loginDao" class="com.ccy.common.login.dao.impl.LoginDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="blogDao" class="com.ccy.blog.blog.dao.impl.BlogDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="replayDao" class="com.ccy.blog.replay.dao.impl.ReplayDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="categoryDao" class="com.ccy.blog.category.dao.impl.CategoryDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="logDao" class="com.ccy.common.log.dao.impl.LogDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+</beans>

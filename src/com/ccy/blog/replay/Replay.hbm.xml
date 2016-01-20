@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 
+3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ccy.blog.replay.Replay" table="t_replay">
+		<id name="id" column="id" type="int">
+			<generator class="native"></generator>
+		</id>
+		<property name="content" column ="content" type="text">
+		</property>
+		<property name="mail" column ="mail" type="string">
+		</property>
+		<property name="name" column ="name" type="string">
+		</property>
+		<many-to-one name="blog" class="com.ccy.blog.blog.Blog" column="blog_id"/>
+	</class>
+</hibernate-mapping>

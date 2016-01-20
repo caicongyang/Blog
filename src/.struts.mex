@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Struts2Diagram version="2.0">
+  <package name="base" location="0,0" size="0,0">
+    <action name="index" location="0,0" size="0,0">
+      <result name="success">
+        <resourceEdge source="success" routing="0" target="index.jsp" />
+      </result>
+      <result name="phone">
+        <resourceEdge source="phone" routing="0" target="phone.html" />
+      </result>
+    </action>
+    <action name="login" location="0,0" size="0,0">
+      <result name="success">
+        <resourceEdge source="success" routing="0" target="success.jsp" />
+      </result>
+      <result name="input">
+        <resourceEdge source="input" routing="0" target="login.jsp" />
+      </result>
+    </action>
+  </package>
+  <package name="blog" location="0,0" size="0,0">
+    <action name="blogDel" location="0,0" size="0,0">
+      <result name="success">
+        <resourceEdge source="success" routing="0" target="blogDel.jsp" />
+      </result>
+    </action>
+    <action name="blogList" location="0,0" size="0,0">
+      <result name="success">
+        <resourceEdge source="success" routing="0" target="blogList.jsp" />
+      </result>
+    </action>
+    <action name="addBlog" location="0,0" size="0,0">
+      <result name="success">
+        <resourceEdge source="success" routing="0" target="blogAdd.jsp" />
+      </result>
+    </action>
+    <action name="addBlogPage" location="0,0" size="0,0">
+      <result name="success">
+        <resourceEdge source="success" routing="0" target="blogAdd.jsp" />
+      </result>
+    </action>
+    <action name="addReplay" location="0,0" size="0,0" />
+    <action name="categoryList" location="0,0" size="0,0" />
+  </package>
+  <package name="weixin" location="0,0" size="0,0">
+    <action name="weixinAccess" location="0,0" size="0,0" />
+  </package>
+  <webResource name="index.jsp" path="/index.jsp" location="0,0" size="0,0" />
+  <webResource name="phone.html" path="/phone.html" location="0,0" size="0,0" />
+  <webResource name="success.jsp" path="/success.jsp" location="0,0" size="0,0" />
+  <webResource name="login.jsp" path="/login.jsp" location="0,0" size="0,0" />
+  <webResource name="blogDel.jsp" path="/blog/blogDel.jsp" location="0,0" size="0,0" />
+  <webResource name="blogList.jsp" path="/blog/blogList.jsp" location="0,0" size="0,0" />
+  <webResource name="blogAdd.jsp" path="/blog/blogAdd.jsp" location="0,0" size="0,0" />
+  <extendsEdge source="blog" target="base" routing="0" />
+  <extendsEdge source="weixin" target="base" routing="0" />
+</Struts2Diagram>
+

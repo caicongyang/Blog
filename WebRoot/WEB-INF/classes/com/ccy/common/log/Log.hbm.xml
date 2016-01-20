@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 
+3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ccy.common.log.Log" table="t_log">
+		<id name="id" column="id" type="int">
+			<generator class="native"></generator>
+		</id>
+		<property name="opname" column="opname" type="string">
+		</property>
+		<property name="opdate" column="opdate" type="date">
+		</property>
+		<property name="opcontent" column="opcontent" type="string">
+		</property>
+		<property name="operation" column="operation" type="string">
+		</property>
+	</class>
+</hibernate-mapping>
